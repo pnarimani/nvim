@@ -24,7 +24,7 @@ return {
     },
   },
 
-  -- Git change indicators in the sign column
+  -- Git change indicators, hunk actions, inline blame
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
@@ -36,8 +36,36 @@ return {
         topdelete    = { text = "^" },
         changedelete = { text = "~" },
       },
-      update_debounce    = 100,
+      update_debounce     = 100,
       attach_to_untracked = false,
+      current_line_blame  = true,
+      current_line_blame_opts = {
+        virt_text = true,
+        delay     = 300,
+      },
+      on_attach = function(bufnr)
+        local gs  = require("gitsigns")
+        local map = function(mode, l, r, desc)
+          vim.keymap.set(mode, l, r, { buffer = bufnr, desc = "Git: " .. desc })
+        end
+        -- Hunk navigation
+        map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
+        map("n", "[h", function() gs.nav_hunk("prev") end, "Previous hunk")
+        -- Staging and resetting
+        map("n", "<leader>hs", gs.stage_hunk,      "Stage hunk")
+        map("n", "<leader>hu", gs.undo_stage_hunk, "Undo stage hunk")
+        map("n", "<leader>hr", gs.reset_hunk,      "Reset hunk")
+        map("n", "<leader>hS", gs.stage_buffer,    "Stage buffer")
+        map("n", "<leader>hR", gs.reset_buffer,    "Reset buffer")
+        -- Blame and diff
+        map("n", "<leader>hb", gs.blame_line, "Blame line")
+        map("n", "<leader>hB", function() gs.blame_line({ full = true }) end, "Blame (full)")
+        map("n", "<leader>hd", gs.diffthis,    "Diff this")
+        map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
+        -- Visual mode hunk operations
+        map("v", "<leader>hs", function() gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Stage hunk")
+        map("v", "<leader>hr", function() gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Reset hunk")
+      end,
     },
   },
 

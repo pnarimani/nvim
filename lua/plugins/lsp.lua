@@ -13,7 +13,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     event        = { "BufReadPre", "BufNewFile" },
-    dependencies = { "j-hui/fidget.nvim" },
+    dependencies = { "j-hui/fidget.nvim", "williamboman/mason-lspconfig.nvim" },
     config       = function()
       -- Merge nvim-cmp advertised capabilities into every server
       local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -24,6 +24,12 @@ return {
 
       -- Apply capabilities globally to all enabled servers
       vim.lsp.config("*", { capabilities = capabilities })
+
+      -- Ensure LSP servers are installed via mason
+      require("mason-lspconfig").setup({
+        ensure_installed  = { "gopls", "zls" },
+        automatic_enable  = false, -- we call vim.lsp.enable() explicitly below
+      })
 
       -- ── Zig ──────────────────────────────────────────────────────────────
       vim.lsp.config("zls", {
@@ -41,6 +47,33 @@ return {
         },
       })
       vim.lsp.enable("zls")
+
+      -- ── Go ───────────────────────────────────────────────────────────────
+      vim.lsp.config("gopls", {
+        settings = {
+          gopls = {
+            gofumpt            = true,
+            staticcheck        = true,
+            usePlaceholders    = true,
+            completeUnimported = true,
+            analyses = {
+              unusedparams = true,
+              shadow       = true,
+              nilness      = true,
+              unusedwrite  = true,
+            },
+            hints = {
+              assignVariableTypes    = true,
+              compositeLiteralFields = true,
+              constantValues         = true,
+              functionTypeParameters = true,
+              parameterNames         = true,
+              rangeVariableTypes     = true,
+            },
+          },
+        },
+      })
+      vim.lsp.enable("gopls")
 
       -- Buffer-local keymaps set once per attach (replaces on_attach)
       vim.api.nvim_create_autocmd("LspAttach", {

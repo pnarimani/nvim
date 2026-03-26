@@ -1,20 +1,15 @@
--- Zig-specific plugins and tooling
+-- Formatters and rendering (multi-language)
 
 return {
-  -- Auto-format with `zig fmt` on save
+  -- Auto-format on save via conform.nvim
   {
     "stevearc/conform.nvim",
     event = "BufWritePre",
-    keys  = {
-      {
-        "<leader>F",
-        function() require("conform").format({ async = true }) end,
-        desc = "Format buffer",
-      },
-    },
     opts = {
       formatters_by_ft = {
-        zig = { "zigfmt" },
+        zig  = { "zigfmt" },
+        go   = { "goimports", "gofumpt" },
+        dart = { "dart_format" },
       },
       formatters = {
         zigfmt = {
@@ -30,7 +25,7 @@ return {
     },
   },
 
-  -- Show inlay hints inline (Neovim 0.10+ native, but this adds toggle support)
+  -- Rendered markdown preview
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft           = { "markdown" },
