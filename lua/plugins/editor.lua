@@ -64,7 +64,7 @@ return {
     cmd          = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      { "nvim-telescope/telescope-fzf-native.nvim", build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release --target libfzf" },
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "if exist build rmdir /s /q build && cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\" && cmake --build build" },
       "nvim-telescope/telescope-ui-select.nvim",
     },
     keys = {
