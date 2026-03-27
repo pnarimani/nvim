@@ -1,3 +1,62 @@
+local function notify_git_history(message, level)
+  vim.notify(message, level or vim.log.levels.INFO, { title = "Git history" })
+end
+
+local function git_root_for(path)
+  local out = vim.fn.systemlist({ "git", "-C", vim.fn.fnamemodify(path, ":h"), "rev-parse", "--show-toplevel" })
+  if vim.v.shell_error ~= 0 or not out[1] or out[1] == "" then return nil end
+  return out[1]
+end
+
+local function relative_to(root, path)
+  local prefix = root .. "/"
+  if path:sub(1, #prefix) == prefix then return path:sub(#prefix + 1) end
+  return path
+end
+
+local function open_git_range_history(bufnr, first_line, last_line)
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == "" then
+    notify_git_history("Buffer is not backed by a file", vim.log.levels.ERROR)
+    return
+  end
+
+  local root = git_root_for(file)
+  if not root then
+    notify_git_history("File is not inside a git repository", vim.log.levels.ERROR)
+    return
+  end
+
+  local start_line = math.min(first_line, last_line)
+  local end_line = math.max(first_line, last_line)
+  local rel_file = relative_to(root, vim.fn.fnamemodify(file, ":p"))
+  local header = string.format("Git history for %s:%d-%d", rel_file, start_line, end_line)
+  local log_spec = string.format("%d,%d:%s", start_line, end_line, rel_file)
+  local lines = vim.fn.systemlist({ "git", "-C", root, "--no-pager", "log", "-p", "-L", log_spec })
+
+  if vim.v.shell_error ~= 0 then
+    notify_git_history(table.concat(lines, "\n"), vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd("tabnew")
+
+  local history_buf = vim.api.nvim_get_current_buf()
+  local content = { header, string.rep("=", #header), "" }
+  vim.list_extend(content, lines)
+
+  vim.bo[history_buf].buftype = "nofile"
+  vim.bo[history_buf].bufhidden = "wipe"
+  vim.bo[history_buf].swapfile = false
+  vim.bo[history_buf].modifiable = true
+  vim.bo[history_buf].filetype = "git"
+
+  vim.api.nvim_buf_set_lines(history_buf, 0, -1, false, content)
+  vim.bo[history_buf].modifiable = false
+
+  vim.keymap.set("n", "q", "<cmd>tabclose<CR>", { buffer = history_buf, silent = true, desc = "Close git history" })
+end
+
 return {
   -- Fuzzy finder over files, grep, buffers
   {
@@ -38,7 +97,7 @@ return {
       },
       update_debounce     = 100,
       attach_to_untracked = false,
-      current_line_blame  = true,
+      current_line_blame  = false,
       current_line_blame_opts = {
         virt_text = true,
         delay     = 300,
@@ -61,9 +120,16 @@ return {
         map("n", "<leader>hb", gs.blame_line, "Blame line")
         map("n", "<leader>hB", function() gs.blame_line({ full = true }) end, "Blame (full)")
         map("n", "<leader>hd", gs.diffthis,    "Diff this")
+        map("n", "<leader>hl", function()
+          local line = vim.api.nvim_win_get_cursor(0)[1]
+          open_git_range_history(bufnr, line, line)
+        end, "Line history")
         map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
         -- Visual mode hunk operations
         map("v", "<leader>hs", function() gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Stage hunk")
+        map("v", "<leader>hl", function()
+          open_git_range_history(bufnr, vim.fn.line("."), vim.fn.line("v"))
+        end, "Selection history")
         map("v", "<leader>hr", function() gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Reset hunk")
       end,
     },

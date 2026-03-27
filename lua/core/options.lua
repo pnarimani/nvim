@@ -14,6 +14,7 @@ opt.smartcase  = true
 
 -- Editing
 opt.clipboard:append("unnamedplus")
+opt.autoindent = true
 opt.updatetime = 200
 opt.timeoutlen = 300
 

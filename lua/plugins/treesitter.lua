@@ -23,15 +23,6 @@ return {
           pcall(vim.treesitter.start, args.buf)
         end,
       })
-
-      -- Use treesitter indentation for these filetypes
-      vim.api.nvim_create_autocmd("FileType", {
-        group   = group,
-        pattern = { "lua", "zig", "c_sharp", "go", "dart" },
-        callback = function(args)
-          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end,
-      })
     end,
   },
 }

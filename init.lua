@@ -27,6 +27,10 @@ for _, p in ipairs({
   vim.g["loaded_" .. p] = 1
 end
 
+-- Enable filetype detection, then load filetype-specific plugins and indent rules.
+vim.cmd("filetype on")
+vim.cmd("filetype plugin indent on")
+
 -- ============================================================================
 -- Core options and keymaps (pure Lua, no plugins required)
 -- ============================================================================
