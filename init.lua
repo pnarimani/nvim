@@ -16,22 +16,6 @@ vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider    = 0
 
 -- ============================================================================
--- Built-in plugins: disable everything we don't need
--- ============================================================================
-for _, p in ipairs({
-  "2html_plugin", "getscript", "getscriptPlugin", "gzip", "logipat",
-  "matchit", "matchparen", "netrw", "netrwFileHandlers", "netrwPlugin",
-  "netrwSettings", "rrhelper", "tar", "tarPlugin", "tohtml", "tutor",
-  "zip", "zipPlugin",
-}) do
-  vim.g["loaded_" .. p] = 1
-end
-
--- Enable filetype detection, then load filetype-specific plugins and indent rules.
-vim.cmd("filetype on")
-vim.cmd("filetype plugin indent on")
-
--- ============================================================================
 -- Core options and keymaps (pure Lua, no plugins required)
 -- ============================================================================
 require("core.options")

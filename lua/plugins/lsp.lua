@@ -79,24 +79,20 @@ return {
             vim.keymap.set({ "n", "x" }, keys, fn, { buffer = bufnr, desc = "LSP: " .. desc })
           end
 
-          -- Navigation (matches ideavimrc: gd, gi, gr, gD; <C-o>/<C-i> are built-in)
-          nmap("gd",  vim.lsp.buf.definition,      "Go to definition")
-          nmap("gD",  vim.lsp.buf.type_definition, "Go to type definition")  -- ideavimrc: GotoTypeDeclaration
-          nmap("gr",  vim.lsp.buf.references,      "Show usages")            -- ideavimrc: ShowUsages
-          nmap("gi",  vim.lsp.buf.implementation,  "Go to implementation")   -- ideavimrc: GotoImplementation
-          nmap("K",   vim.lsp.buf.hover,           "Hover docs")
+          local builtin = require("telescope.builtin")
 
-          -- Refactoring (matches ideavimrc: <leader>rn, <leader>f, <leader>re, <leader>rr)
-          nmap("<leader>rn",  vim.lsp.buf.rename,                                  "Rename symbol")
-          nmap("<leader>f",   function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
-          nvmap("<leader>re", vim.lsp.buf.code_action, "Intention actions")        -- ideavimrc: ShowIntentionActions
-          nvmap("<leader>rr", vim.lsp.buf.code_action, "Refactoring actions")      -- ideavimrc: Refactorings.QuickListPopupAction
-          nmap("<leader>ca",  vim.lsp.buf.code_action, "Code action")              -- nvim extra
+          -- Navigation via Telescope (fuzzy + preview)
+          nmap("gd",  builtin.lsp_definitions,      "Go to definition")
+          nmap("gD",  builtin.lsp_type_definitions,  "Go to type definition")
+          nmap("gr",  builtin.lsp_references,        "Show usages")
+          nmap("gi",  builtin.lsp_implementations,   "Go to implementation")
+          nmap("K",   vim.lsp.buf.hover,             "Hover docs")
 
-          -- Find usages (ideavimrc: <leader>gr → FindUsages)
-          nmap("<leader>gr", function()
-            require("telescope.builtin").lsp_references()
-          end, "Find usages")
+          -- Refactoring
+          nmap("<leader>rn", vim.lsp.buf.rename,                                  "Rename symbol")
+          nmap("<leader>f",  function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
+          nvmap("<leader>re", vim.lsp.buf.code_action, "Code action")
+
         end,
       })
     end,

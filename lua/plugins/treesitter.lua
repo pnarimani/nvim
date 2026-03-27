@@ -2,7 +2,8 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    lazy  = false,  -- load at startup so FileType autocmds are registered in time
+    lazy  = false,
+    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
     config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
@@ -10,18 +11,30 @@ return {
           "go", "gomod", "gowork", "gosum", "dart",
         },
         auto_install = true,
-      })
-
-      local group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true })
-
-      -- Enable treesitter-based syntax highlighting per filetype
-      vim.api.nvim_create_autocmd("FileType", {
-        group   = group,
-        pattern = { "lua", "vim", "help", "zig", "c_sharp", "markdown",
-                    "go", "gomod", "gowork", "gosum", "dart" },
-        callback = function(args)
-          pcall(vim.treesitter.start, args.buf)
-        end,
+        highlight = { enable = true },
+        indent    = { enable = true },
+        textobjects = {
+          select = {
+            enable  = true,
+            lookahead = true,
+            keymaps = {
+              ["aa"] = { query = "@parameter.outer", desc = "Around argument" },
+              ["ia"] = { query = "@parameter.inner", desc = "Inside argument" },
+              ["af"] = { query = "@function.outer",  desc = "Around function" },
+              ["if"] = { query = "@function.inner",  desc = "Inside function" },
+              ["ac"] = { query = "@class.outer",     desc = "Around class" },
+              ["ic"] = { query = "@class.inner",     desc = "Inside class" },
+            },
+          },
+          move = {
+            enable = true,
+            set_jumps = true,
+            goto_next_start     = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
+            goto_next_end       = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+            goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
+            goto_previous_end   = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+          },
+        },
       })
     end,
   },

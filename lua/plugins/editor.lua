@@ -58,29 +58,73 @@ local function open_git_range_history(bufnr, first_line, last_line)
 end
 
 return {
-  -- Fuzzy finder over files, grep, buffers
+  -- Fuzzy finder over files, grep, buffers, LSP, and more
   {
     "nvim-telescope/telescope.nvim",
     cmd          = "Telescope",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+      "nvim-telescope/telescope-ui-select.nvim",
+    },
     keys = {
-      -- <leader>sf → GotoClass equivalent (find files)
-      { "<leader>sf", function() require("telescope.builtin").find_files() end,                         desc = "Find files" },
-      -- <leader>ss → GotoSymbol (workspace symbols)
-      { "<leader>ss", function() require("telescope.builtin").lsp_dynamic_workspace_symbols() end,     desc = "Workspace symbols" },
-      -- <leader>sd → FileStructurePopup (document symbols)
-      { "<leader>sd", function() require("telescope.builtin").lsp_document_symbols() end,              desc = "Document symbols" },
-      -- <leader>sg → live grep (text search, no direct ideavimrc equivalent but essential)
-      { "<leader>sg", function() require("telescope.builtin").live_grep() end,                          desc = "Live grep" },
+      -- File / text search
+      { "<leader>sf", function() require("telescope.builtin").find_files() end,                    desc = "Find files" },
+      { "<leader>sg", function() require("telescope.builtin").live_grep() end,                     desc = "Live grep" },
+      { "<leader>sw", function() require("telescope.builtin").grep_string() end,                   desc = "Grep word under cursor" },
+      { "<leader>s/", function() require("telescope.builtin").current_buffer_fuzzy_find() end,     desc = "Search in buffer" },
+      -- LSP symbols
+      { "<leader>ss", function() require("telescope.builtin").lsp_dynamic_workspace_symbols() end, desc = "Workspace symbols" },
+      { "<leader>sd", function() require("telescope.builtin").lsp_document_symbols() end,          desc = "Document symbols" },
+      -- Buffers / recent
+      { "<leader>sb", function() require("telescope.builtin").buffers() end,                       desc = "Buffers" },
+      { "<leader>sr", function() require("telescope.builtin").oldfiles() end,                      desc = "Recent files" },
+      -- Help / keymaps
+      { "<leader>sh", function() require("telescope.builtin").help_tags() end,                     desc = "Help tags" },
+      { "<leader>sk", function() require("telescope.builtin").keymaps() end,                       desc = "Keymaps" },
+      -- Diagnostics
+      { "<leader>se", function() require("telescope.builtin").diagnostics() end,                   desc = "Diagnostics" },
+      -- Git
+      { "<leader>sc", function() require("telescope.builtin").git_commits() end,                   desc = "Git commits" },
+      { "<leader>sB", function() require("telescope.builtin").git_branches() end,                  desc = "Git branches" },
+      { "<leader>st", function() require("telescope.builtin").git_status() end,                    desc = "Git status" },
+      -- Resume last picker
+      { "<leader>sR", function() require("telescope.builtin").resume() end,                        desc = "Resume last picker" },
     },
-    opts = {
-      defaults = {
-        prompt_prefix    = "> ",
-        selection_caret  = "> ",
-        sorting_strategy = "ascending",
-        layout_config    = { prompt_position = "top" },
-      },
-    },
+    config = function(_, opts)
+      local telescope = require("telescope")
+      local actions   = require("telescope.actions")
+
+      telescope.setup(vim.tbl_deep_extend("force", opts or {}, {
+        defaults = {
+          prompt_prefix    = "> ",
+          selection_caret  = "> ",
+          sorting_strategy = "ascending",
+          layout_config    = { prompt_position = "top" },
+          path_display     = { "truncate" },
+          file_ignore_patterns = { "%.git/", "node_modules/", "%.DS_Store" },
+          mappings = {
+            i = {
+              ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+            },
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy                   = true,
+            override_generic_sorter = true,
+            override_file_sorter    = true,
+            case_mode               = "smart_case",
+          },
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown(),
+          },
+        },
+      }))
+
+      telescope.load_extension("fzf")
+      telescope.load_extension("ui-select")
+    end,
   },
 
   -- Git change indicators, hunk actions, inline blame
@@ -157,14 +201,8 @@ return {
   -- gc / gcc to comment lines and motions
   {
     "numToStr/Comment.nvim",
-    keys = { "gc", "gcc" },
-    opts = {},
-  },
-
-  -- Briefly highlight the yanked region
-  {
-    "machakann/vim-highlightedyank",
-    event = "TextYankPost",
+    event = "VeryLazy",
+    opts  = {},
   },
 
   -- Highlight unique characters for f/t motions
@@ -177,11 +215,5 @@ return {
         "n","o","p","q","r","s","t","u","v","w","x","y","z",
       }
     end,
-  },
-
-  -- aa / ia text objects for function arguments
-  {
-    "vim-scripts/argtextobj.vim",
-    event = "VeryLazy",
   },
 }

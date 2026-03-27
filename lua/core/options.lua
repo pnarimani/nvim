@@ -18,6 +18,12 @@ opt.autoindent = true
 opt.updatetime = 200
 opt.timeoutlen = 300
 
+-- Highlight yanked text (built-in, replaces vim-highlightedyank)
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group    = vim.api.nvim_create_augroup("HighlightYank", { clear = true }),
+  callback = function() vim.highlight.on_yank({ timeout = 200 }) end,
+})
+
 -- Persistent undo (try standard locations in order)
 local function ensure_dir(path)
   if vim.fn.isdirectory(path) == 1 then return true end
