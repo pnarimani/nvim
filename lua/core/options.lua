@@ -15,6 +15,10 @@ opt.smartcase  = true
 -- Editing
 opt.clipboard:append("unnamedplus")
 opt.autoindent = true
+opt.expandtab  = true
+opt.shiftwidth = 2
+opt.softtabstop = 2
+opt.tabstop    = 2
 opt.updatetime = 200
 opt.timeoutlen = 300
 

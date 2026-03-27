@@ -1,12 +1,14 @@
 return {
   {
-    "folke/tokyonight.nvim",
+    "rebelot/kanagawa.nvim",
     lazy     = false,  -- must load at startup to set colors before other UI
     priority = 1000,
-    opts     = { style = "moon" },
+    opts     = {
+      theme = "dragon",
+    },
     config   = function(_, opts)
-      require("tokyonight").setup(opts)
-      vim.cmd.colorscheme("tokyonight")
+      require("kanagawa").setup(opts)
+      vim.cmd.colorscheme("kanagawa-dragon")
     end,
   },
 }
