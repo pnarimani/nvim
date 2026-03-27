@@ -14,29 +14,41 @@ return {
         auto_install = true,
         highlight = { enable = true },
         indent    = { enable = true },
-        textobjects = {
-          select = {
-            enable  = true,
-            lookahead = true,
-            keymaps = {
-              ["aa"] = { query = "@parameter.outer", desc = "Around argument" },
-              ["ia"] = { query = "@parameter.inner", desc = "Inside argument" },
-              ["af"] = { query = "@function.outer",  desc = "Around function" },
-              ["if"] = { query = "@function.inner",  desc = "Inside function" },
-              ["ac"] = { query = "@class.outer",     desc = "Around class" },
-              ["ic"] = { query = "@class.inner",     desc = "Inside class" },
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start     = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
-            goto_next_end       = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-            goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
-            goto_previous_end   = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
-          },
-        },
       })
+
+      require("nvim-treesitter-textobjects").setup({
+        select = { lookahead = true },
+        move   = { set_jumps = true },
+      })
+
+      local sel  = require("nvim-treesitter-textobjects.select")
+      local move = require("nvim-treesitter-textobjects.move")
+
+      -- Text objects (visual + operator-pending)
+      local textobjects = {
+        ["aa"] = { "@parameter.outer", "Around argument" },
+        ["ia"] = { "@parameter.inner", "Inside argument" },
+        ["af"] = { "@function.outer",  "Around function" },
+        ["if"] = { "@function.inner",  "Inside function" },
+        ["ac"] = { "@class.outer",     "Around class" },
+        ["ic"] = { "@class.inner",     "Inside class" },
+      }
+      for key, def in pairs(textobjects) do
+        local query, desc = def[1], def[2]
+        vim.keymap.set({ "x", "o" }, key, function()
+          sel.select_textobject(query)
+        end, { desc = desc })
+      end
+
+      -- Jump to next/previous function or class
+      vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer") end,     { desc = "Next function start" })
+      vim.keymap.set("n", "]F", function() move.goto_next_end("@function.outer") end,       { desc = "Next function end" })
+      vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer") end, { desc = "Prev function start" })
+      vim.keymap.set("n", "[F", function() move.goto_previous_end("@function.outer") end,   { desc = "Prev function end" })
+      vim.keymap.set("n", "]c", function() move.goto_next_start("@class.outer") end,        { desc = "Next class start" })
+      vim.keymap.set("n", "]C", function() move.goto_next_end("@class.outer") end,          { desc = "Next class end" })
+      vim.keymap.set("n", "[c", function() move.goto_previous_start("@class.outer") end,    { desc = "Prev class start" })
+      vim.keymap.set("n", "[C", function() move.goto_previous_end("@class.outer") end,      { desc = "Prev class end" })
     end,
   },
 }
