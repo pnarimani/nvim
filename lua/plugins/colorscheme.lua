@@ -5,6 +5,11 @@ return {
     priority = 1000,
     opts     = {
       theme = "dragon",
+      overrides = function(colors)
+        return {
+          CursorLine = { bg = colors.palette.dragonBlack4 },
+        }
+      end,
     },
     config   = function(_, opts)
       require("kanagawa").setup(opts)

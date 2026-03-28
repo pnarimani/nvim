@@ -3,6 +3,7 @@ local opt = vim.opt
 -- UI
 opt.number         = true
 opt.relativenumber = true
+opt.cursorline     = true
 opt.signcolumn     = "yes"
 opt.termguicolors  = true
 opt.showmode       = true

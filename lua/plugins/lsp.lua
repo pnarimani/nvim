@@ -27,8 +27,8 @@ local function apply_reference_highlights()
   local visual = vim.api.nvim_get_hl(0, { name = "Visual", link = false })
 
   local base_bg = normal.bg or 0x1f2335
-  local accent_bg = cursorline.bg or visual.bg or 0x2a2f44
-  local subtle_bg = blend_colors(base_bg, accent_bg, 0.35)
+  local accent_bg = visual.bg or cursorline.bg or 0x2d4f67
+  local subtle_bg = blend_colors(base_bg, accent_bg, 0.6)
 
   for _, group in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do
     vim.api.nvim_set_hl(0, group, { bg = subtle_bg })

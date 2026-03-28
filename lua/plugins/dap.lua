@@ -52,7 +52,7 @@ return {
       })
 
       -- ── Virtual text (inline variable values) ──────────────────────────
-      require("nvim-dap-virtual-text").setup({ commented = true })
+      require("nvim-dap-virtual-text").setup({ enabled = false })
 
       -- ── Auto open/close UI on debug sessions ──────────────────────────
       dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
@@ -73,7 +73,51 @@ return {
       })
 
       -- ── Go (Delve) ────────────────────────────────────────────────────
-      require("dap-go").setup()
+      -- On Windows: Mason creates a .cmd shim that libuv can't spawn directly.
+      -- Point to the real .exe. Also pin port outside Windows reserved ranges (54875-55693).
+      local mason_dlv = vim.fn.stdpath("data") .. "/mason/packages/delve/dlv.exe"
+      local system_dlv = vim.fn.expand("~/go/bin/dlv.exe")
+      local dlv_path = vim.fn.filereadable(mason_dlv) == 1 and mason_dlv or system_dlv
+      require("dap-go").setup({
+        delve = { path = dlv_path, port = "61234" },
+      })
+
+      -- Patch the adapter so Delve's CWD is always the Go module root.
+      -- Without this, Delve inherits Neovim's CWD (nvim config dir) and `go build`
+      -- fails because it can't find go.mod.
+      local dap = require("dap")
+      local orig = dap.adapters.go
+      dap.adapters.go = function(cb, config)
+        local dir = vim.fn.expand("%:p:h")
+        local gomod = vim.fn.findfile("go.mod", dir .. ";")
+        local cwd = gomod ~= "" and vim.fn.fnamemodify(gomod, ":h") or dir
+        local function patched_cb(adapter)
+          if adapter.executable then
+            adapter.executable.cwd = cwd
+          end
+          cb(adapter)
+        end
+        if type(orig) == "function" then
+          orig(patched_cb, config)
+        else
+          local a = vim.deepcopy(orig)
+          if a.executable then a.executable.cwd = cwd end
+          cb(a)
+        end
+      end
+
+      -- Replace the default "Debug" config (which uses ${file} and breaks multi-file
+      -- packages) with one that uses the package directory instead.
+      dap.configurations.go = vim.tbl_filter(function(c)
+        return c.name ~= "Debug"
+      end, dap.configurations.go or {})
+      table.insert(dap.configurations.go, 1, {
+        type       = "go",
+        name       = "Debug",
+        request    = "launch",
+        program    = "${fileDirname}",
+        outputMode = "remote",
+      })
     end,
   },
 }
