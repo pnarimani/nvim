@@ -4,7 +4,9 @@ return {
     branch = "master",
     build = ":TSUpdate",
     lazy  = false,
-    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
+    dependencies = {
+      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "master" },
+    },
     config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
@@ -14,15 +16,14 @@ return {
         auto_install = true,
         highlight = { enable = true },
         indent    = { enable = true },
+        textobjects = {
+          select = { enable = true, lookahead = true },
+          move   = { enable = true, set_jumps = true },
+        },
       })
 
-      require("nvim-treesitter-textobjects").setup({
-        select = { lookahead = true },
-        move   = { set_jumps = true },
-      })
-
-      local sel  = require("nvim-treesitter-textobjects.select")
-      local move = require("nvim-treesitter-textobjects.move")
+      local sel  = require("nvim-treesitter.textobjects.select")
+      local move = require("nvim-treesitter.textobjects.move")
 
       -- Text objects (visual + operator-pending)
       local textobjects = {
