@@ -74,7 +74,7 @@ return {
     },
     keys = {
       -- File / text search
-      { "<leader>sf", function() require("telescope.builtin").find_files() end,                    desc = "Find files" },
+      { "<leader>sf", function() require("telescope.builtin").find_files({ hidden = true }) end,   desc = "Find files" },
       { "<leader>sg", function() require("telescope.builtin").live_grep() end,                     desc = "Live grep" },
       { "<leader>sw", function() require("telescope.builtin").grep_string() end,                   desc = "Grep word under cursor" },
       { "<leader>s/", function() require("telescope.builtin").current_buffer_fuzzy_find() end,     desc = "Search in buffer" },
@@ -112,6 +112,11 @@ return {
             i = {
               ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
             },
+          },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
           },
         },
         extensions = {
