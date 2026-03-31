@@ -108,7 +108,7 @@ return {
 
       -- Ensure LSP servers are installed via mason
       require("mason-lspconfig").setup({
-        ensure_installed  = { "gopls", "zls" },
+        ensure_installed  = { "gopls", "htmx", "ts_ls", "zls" },
         automatic_enable  = false, -- we call vim.lsp.enable() explicitly below
       })
 
@@ -147,6 +147,23 @@ return {
         },
       })
       vim.lsp.enable("gopls")
+
+      -- ── TypeScript / JavaScript ───────────────────────────────────────────
+      vim.lsp.config("ts_ls", {
+        filetypes = {
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+        },
+      })
+      vim.lsp.enable("ts_ls")
+
+      -- ── HTMX (Go templates) ───────────────────────────────────────────────
+      vim.lsp.config("htmx", {
+        filetypes = { "gotmpl" },
+      })
+      vim.lsp.enable("htmx")
 
       -- Buffer-local keymaps set once per attach (replaces on_attach)
       vim.api.nvim_create_autocmd("LspAttach", {
