@@ -149,6 +149,14 @@ return {
       vim.lsp.enable("gopls")
 
       -- ── TypeScript / JavaScript ───────────────────────────────────────────
+      vim.lsp.config("ts_ls", {
+        filetypes = {
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+        },
+      })
       vim.lsp.enable("ts_ls")
 
       -- ── HTMX (Go templates) ───────────────────────────────────────────────
