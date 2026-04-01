@@ -185,7 +185,6 @@ return {
           nmap("gD",  builtin.lsp_type_definitions,  "Go to type definition")
           nmap("gr",  telescope_lsp_references,      "Show usages")
           nmap("gi",  builtin.lsp_implementations,   "Go to implementation")
-          nmap("K",   vim.lsp.buf.hover,             "Hover docs")
 
           -- Refactoring
           nmap("<leader>rn", vim.lsp.buf.rename,                                  "Rename symbol")

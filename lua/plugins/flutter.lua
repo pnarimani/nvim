@@ -30,6 +30,9 @@ return {
             enableSnippets        = true,
             updateImportsOnRename = true,
           },
+          on_attach = function(_, bufnr)
+            vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+          end,
         },
         debugger = {
           enabled     = true,

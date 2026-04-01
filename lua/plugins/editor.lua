@@ -189,43 +189,9 @@ return {
     },
   },
 
-  -- Visualise and navigate the undo tree
-  {
-    "mbbill/undotree",
-    cmd  = { "UndotreeToggle", "UndotreeShow", "UndotreeHide" },
-    keys = { { "<leader>u", "<cmd>UndotreeToggle<CR>", desc = "Undotree" } },
-    init = function()
-      vim.g.undotree_SetFocusWhenToggle = 1
-      vim.g.undotree_SplitWidth         = 40
-      vim.g.undotree_WindowLayout       = 2
-      -- On Windows, diff is not in PATH by default; try to find it via Git for Windows.
-      if vim.fn.executable("diff") == 0 then
-        local git = vim.fn.exepath("git")
-        if git ~= "" then
-          -- Git for Windows ships diff.exe at <git-root>/usr/bin/diff.exe
-          local git_diff = vim.fn.fnamemodify(git, ":h:h") .. "/usr/bin/diff.exe"
-          if vim.fn.executable(git_diff) == 1 then
-            vim.g.undotree_DiffCommand = git_diff
-          else
-            vim.g.undotree_DiffAutoOpen = 0
-          end
-        else
-          vim.g.undotree_DiffAutoOpen = 0
-        end
-      end
-    end,
-  },
-
   -- Surround text objects with brackets, quotes, tags …
   {
     "kylechui/nvim-surround",
-    event = "VeryLazy",
-    opts  = {},
-  },
-
-  -- gc / gcc to comment lines and motions
-  {
-    "numToStr/Comment.nvim",
     event = "VeryLazy",
     opts  = {},
   },
