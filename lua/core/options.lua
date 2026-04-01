@@ -8,6 +8,10 @@ opt.signcolumn     = "yes"
 opt.termguicolors  = true
 opt.showmode       = true
 
+-- Completion popup (Neovim 0.12+)
+opt.pumborder    = "single"
+opt.pummaxwidth  = 40
+
 -- Search
 opt.incsearch  = true
 opt.ignorecase = true

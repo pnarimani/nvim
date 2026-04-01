@@ -74,21 +74,12 @@ local function telescope_lsp_references()
 end
 
 return {
-  -- LSP progress / status indicator (shown in the corner while ZLS indexes)
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts  = {
-      notification = { window = { winblend = 0 } },
-    },
-  },
-
   -- Provides server definitions (cmd, filetypes, root_markers) via lsp/ runtime dir.
   -- We use vim.lsp.config / vim.lsp.enable (nvim 0.11 API) instead of require('lspconfig').
   {
     "neovim/nvim-lspconfig",
     event        = { "BufReadPre", "BufNewFile" },
-    dependencies = { "j-hui/fidget.nvim", "williamboman/mason-lspconfig.nvim" },
+    dependencies = { "williamboman/mason-lspconfig.nvim" },
     config       = function()
       apply_reference_highlights()
       vim.api.nvim_create_autocmd("ColorScheme", {
@@ -96,14 +87,8 @@ return {
         callback = apply_reference_highlights,
       })
 
-      -- Merge nvim-cmp advertised capabilities into every server
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-      if ok_cmp then
-        capabilities = cmp_lsp.default_capabilities(capabilities)
-      end
-
-      -- Apply capabilities globally to all enabled servers
+      -- Merge blink.cmp advertised capabilities into every server
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
       vim.lsp.config("*", { capabilities = capabilities })
 
       -- Ensure LSP servers are installed via mason

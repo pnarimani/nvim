@@ -196,15 +196,21 @@ return {
     opts  = {},
   },
 
-  -- Highlight unique characters for f/t motions
+  -- Enhanced motions with search labels, f/t improvements, treesitter selection
   {
-    "unblevable/quick-scope",
+    "folke/flash.nvim",
     event = "VeryLazy",
-    init  = function()
-      vim.g.qs_accepted_chars = {
-        "a","b","c","d","e","f","g","h","i","j","k","l","m",
-        "n","o","p","q","r","s","t","u","v","w","x","y","z",
-      }
-    end,
+    opts = {
+      modes = {
+        char = { jump_labels = true },
+      },
+    },
+    keys = {
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,            desc = "Flash" },
+      { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,      desc = "Flash Treesitter" },
+      { "r",     mode = "o",               function() require("flash").remote() end,           desc = "Remote Flash" },
+      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,           desc = "Toggle Flash Search" },
+    },
   },
 }
