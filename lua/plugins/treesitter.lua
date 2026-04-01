@@ -11,6 +11,19 @@ return {
       require("nvim-treesitter").install({
         "lua", "vim", "vimdoc", "zig", "c_sharp", "markdown",
         "go", "gomod", "gowork", "gosum", "dart",
+        "javascript", "typescript", "tsx", "html", "css", "json",
+      })
+
+      -- Enable treesitter highlighting and indentation for all buffers
+      -- (the new main branch no longer does this automatically)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true }),
+        callback = function(ev)
+          if vim.treesitter.language.add(vim.treesitter.language.get_lang(ev.match) or ev.match) then
+            vim.treesitter.start(ev.buf)
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
     end,
   },

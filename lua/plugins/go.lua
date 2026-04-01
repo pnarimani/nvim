@@ -13,7 +13,7 @@ return {
       lsp_gofumpt  = false, -- handled by conform.nvim
       lsp_keymaps  = false, -- our keymaps in lsp.lua
       trouble      = true,
-      luasnip      = true,
+      luasnip      = false,
       dap_debug    = true,
     },
     config = function(_, opts)
