@@ -20,6 +20,9 @@ vim.g.loaded_ruby_provider    = 0
 -- ============================================================================
 require("core.options")
 require("core.keymaps")
+if vim.g.vscode then
+  require("core.vscode")
+end
 
 -- ============================================================================
 -- Lazy.nvim bootstrap

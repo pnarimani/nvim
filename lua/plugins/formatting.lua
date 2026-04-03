@@ -1,3 +1,5 @@
+if vim.g.vscode then return {} end
+
 -- Formatters and rendering (multi-language)
 
 return {

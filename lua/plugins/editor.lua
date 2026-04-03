@@ -57,10 +57,13 @@ local function open_git_range_history(bufnr, first_line, last_line)
   vim.keymap.set("n", "q", "<cmd>tabclose<CR>", { buffer = history_buf, silent = true, desc = "Close git history" })
 end
 
+local is_vscode = vim.g.vscode
+
 return {
   -- Fuzzy finder over files, grep, buffers, LSP, and more
   {
     "nvim-telescope/telescope.nvim",
+    enabled      = not is_vscode,
     cmd          = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -140,6 +143,7 @@ return {
   -- Git change indicators, hunk actions, inline blame
   {
     "lewis6991/gitsigns.nvim",
+    enabled = not is_vscode,
     event = { "BufReadPre", "BufNewFile" },
     opts  = {
       signs = {

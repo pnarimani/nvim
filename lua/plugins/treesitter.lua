@@ -1,3 +1,5 @@
+local is_vscode = vim.g.vscode
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -13,6 +15,8 @@ return {
         "go", "gomod", "gowork", "gosum", "dart",
         "javascript", "typescript", "tsx", "html", "css", "json",
       })
+
+      if is_vscode then return end
 
       -- Enable treesitter highlighting and indentation for all buffers
       -- (the new main branch no longer does this automatically)

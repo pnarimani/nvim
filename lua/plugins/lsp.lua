@@ -1,3 +1,5 @@
+if vim.g.vscode then return {} end
+
 local function split_rgb(color)
   return math.floor(color / 0x10000), math.floor(color / 0x100) % 0x100, color % 0x100
 end
